@@ -6,21 +6,100 @@
   </head>
   <body>
     <script>
+    var index = 0;
+
+    
+
+    var timeStamp = function() {
+          // Create a date object with the current time
+            var now = new Date();
+           
+          // Create an array with the current month, day and time
+            var date = [ now.getMonth() + 1, now.getDate(), now.getFullYear() ];
+           
+          // Create an array with the current hour, minute and second
+            var time = [ now.getHours(), now.getMinutes(), now.getSeconds() ];
+           
+          // Determine AM or PM suffix based on the hour
+            var suffix = ( time[0] < 12 ) ? "AM" : "PM";
+           
+          // Convert hour from military time
+            time[0] = ( time[0] < 12 ) ? time[0] : time[0] - 12;
+           
+          // If hour is 0, set it to 12
+            time[0] = time[0] || 12;
+           
+          // If seconds and minutes are less than 10, add a zero
+            for ( var i = 1; i < 3; i++ ) {
+              if ( time[i] < 10 ) {
+                time[i] = "0" + time[i];
+              }
+            }
+ 
+          // Return the formatted string
+            return date.join("/") + " " + time.join(":") + " " + suffix;
+          }
+      var updateFeed = function(){
+          while(index < streams.home.length){
+          //console.log(index, streams);
+          var tweet = streams.home[index];
+          var $tweet = $('<div class="tweet ' + tweet.user + '"></div>');
+          $tweet.html('@<a href="#" id="userclick" class="' + tweet.user + '" name="userclick">' + tweet.user + '</a>:<br>' + tweet.message + '<br><i>' + timeStamp() + "</i>");
+          $('#userclick').on('click', function(){
+            var tuser = 'douglascalhoun';
+            //for each in array users
+            for (var i = 0; i < users.length; i++){
+               //if hasclass
+               console.log(users[i]);
+               if ($(this).hasClass(users[i]))
+                 {console.log('match');
+                  tuser = users[i];} 
+            }
+
+            $('.tweet').hide();
+            $('.' + tuser).show();
+            clearInterval(myInterval);
+            var $button = $('<button id= "back" name = "back">back</button>');
+            $button.prependTo($('body'));
+        
+          $('#back').on('click', function(){
+            console.log('back');
+            $('.tweet').show();
+            $('#back').remove();
+            updateFeed();
+            myInterval = setInterval(updateFeed, 5000);
+            
+          });
+          });
+
+          $tweet.css({"background-color": "white",
+                        "padding": "10px",
+                        "border": "5px solid black",
+                        "margin": "8px",
+                        "box-shadow": "5px 5px 3px #888888"});
+          //console.log($tweet, tweet);
+          $tweet.prependTo($('body'));
+          //console.log(tweet.user, $tweet)
+          index += 1;
+          }
+            //var $label = $('<label>refreshed ' + timeStamp() + '</label>');
+            //$label.prependTo($('body'));
+            $tweet.hide();
+
+      }
+      var userTweets = function(){
+
+
+      };
 
       $(document).ready(function(){
-        var $body = $('body');
-        $body.html('');
-
-        var index = streams.home.length - 1;
-        while(index >= 0){
-          var tweet = streams.home[index];
-          var $tweet = $('<div></div>');
-          $tweet.text('@' + tweet.user + ': ' + tweet.message);
-          $tweet.appendTo($body);
-          index -= 1;
-        }
-
-      });
+        
+        $('body').html('')
+                 .css({"background-color": "#6699CC"});
+        updateFeed();
+        myInterval = setInterval(updateFeed, 5000);
+      
+        });
 
     </script>
   </body>
